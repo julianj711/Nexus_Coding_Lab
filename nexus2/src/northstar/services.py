@@ -72,7 +72,7 @@ class CustomerLifecycleService:
             raise ValueError("deactivation reason must contain at least five characters")
 
         customer.active = False
-        self._repository.save(customer)
+        self._repository.save(customer)    
         self._events.publish(
             DomainEvent(
                 event_type="customer.deactivated",

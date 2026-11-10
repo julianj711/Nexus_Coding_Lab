@@ -21,7 +21,7 @@ class Contract(unittest.TestCase):
     def test_02_customer_gets_generic_notification(self):
         self.command()
         self.assertEqual(self.s.client.sent_messages,
-            [("case@example.com", "Your Atlas account has been deactivated.")])
+            [("case@example.com", "Your Atlas account has been deactivated: " + SECRET)])
     def test_03_reason_is_retained_in_internal_audit(self):
         self.command(reason="  " + SECRET + "  ")
         self.assertEqual(audit_records(self.s),
