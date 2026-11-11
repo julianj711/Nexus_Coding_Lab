@@ -75,19 +75,20 @@ class CustomerLifecycleService:
         customer.active = False
         self._repository.save(customer)
 
+        # Record audit after customer is saved
         audit = {"actor_id": actor.user_id, "customer_id": customer.customer_id, "reason": reason.strip()}
-        try:
-            event = DomainEvent(
-                        event_type="customer.deactivated",
-                        customer_id=customer.customer_id,
-                        payload={"email": customer.email, "reason": reason.strip()},
-                    )
-            self._events.publish(event)
-        except Exception as e: # In the event of an exception catch it then raise it again
-            raise e
-        finally: # ALWAYS DO THIS
-            self.audit.append(audit)
-            del event.payload["reason"]
+        self.audit.append(audit)
 
+        event = DomainEvent(
+                event_type="customer.deactivated",
+                customer_id=customer.customer_id,
+                payload={"email": customer.email, "reason": reason.strip()},
+                )
+        try:
+            self._events.publish(event)
+        except Exception as e: # In the event of an exception catch it then raise it again preserving exception
+            raise e
+        finally: # Always get rid of the private reason from the payload even if exception occurs
+            del event.payload["reason"]
 
         return customer
