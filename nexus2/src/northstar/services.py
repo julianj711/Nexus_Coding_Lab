@@ -61,6 +61,7 @@ class CustomerLifecycleService:
         self._repository = repository
         self._authorization = authorization
         self._events = events
+        self.audit = []
 
     def deactivate(self, actor: Actor, customer_id: str, reason: str) -> Customer:
         self._authorization.require_customer_management(actor)
@@ -72,12 +73,21 @@ class CustomerLifecycleService:
             raise ValueError("deactivation reason must contain at least five characters")
 
         customer.active = False
-        self._repository.save(customer)    
-        self._events.publish(
-            DomainEvent(
-                event_type="customer.deactivated",
-                customer_id=customer.customer_id,
-                payload={"email": customer.email, "reason": reason.strip()},
-            )
-        )
+        self._repository.save(customer)
+
+        audit = {"actor_id": actor.user_id, "customer_id": customer.customer_id, "reason": reason.strip()}
+        try:
+            event = DomainEvent(
+                        event_type="customer.deactivated",
+                        customer_id=customer.customer_id,
+                        payload={"email": customer.email, "reason": reason.strip()},
+                    )
+            self._events.publish(event)
+        except Exception as e: # In the event of an exception catch it then raise it again
+            raise e
+        finally: # ALWAYS DO THIS
+            self.audit.append(audit)
+            del event.payload["reason"]
+
+
         return customer

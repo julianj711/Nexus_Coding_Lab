@@ -24,6 +24,3 @@ class CustomerNotificationSubscriber:
             self.client.send(email, f"Welcome to Atlas, {event.payload.get('name', 'customer')}!")
         elif event.event_type == "customer.deactivated":
             self.client.send(email, f"Your Atlas account has been deactivated: {event.payload.get('reason', '')}")
-
-        del event.payload["reason"]
-        
