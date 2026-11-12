@@ -77,6 +77,7 @@ class CustomerLifecycleService:
         # Record audit after customer is saved
         audit = {"actor_id": actor.user_id, "customer_id": customer.customer_id, "reason": reason.strip()}
         self._repository.audit_log(audit)
+        self._repository.audit_save()
 
         event = DomainEvent(
                 event_type="customer.deactivated",
