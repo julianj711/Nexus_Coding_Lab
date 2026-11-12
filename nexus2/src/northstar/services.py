@@ -61,7 +61,6 @@ class CustomerLifecycleService:
         self._repository = repository
         self._authorization = authorization
         self._events = events
-        self.audit = []
 
     def deactivate(self, actor: Actor, customer_id: str, reason: str) -> Customer:
         self._authorization.require_customer_management(actor)
@@ -77,7 +76,7 @@ class CustomerLifecycleService:
 
         # Record audit after customer is saved
         audit = {"actor_id": actor.user_id, "customer_id": customer.customer_id, "reason": reason.strip()}
-        self.audit.append(audit)
+        self._repository.audit_log(audit)
 
         event = DomainEvent(
                 event_type="customer.deactivated",

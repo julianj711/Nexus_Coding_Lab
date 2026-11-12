@@ -24,5 +24,6 @@ def build():
 def audit_records(system):
     # Return a list of mappings with customer_id, actor_id, reason.
     # Map your real audit objects here if necessary. Never synthesize the answer.
-    system.audit = system.lifecycle.audit
+    system.audit = system.repository._audit # Repository version
+
     return system.audit
