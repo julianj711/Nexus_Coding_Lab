@@ -54,5 +54,4 @@ class Contract(unittest.TestCase):
             [{"customer_id":"c1", "actor_id":"u-review", "reason":SECRET}])
         self.assertNotIn(SECRET, repr(self.s.bus.published))
         self.assertEqual(self.s.client.sent_messages, [])
-
 if __name__ == "__main__": unittest.main()
