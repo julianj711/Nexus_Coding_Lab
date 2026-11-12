@@ -37,7 +37,7 @@ class InMemoryCustomerRepository(CustomerRepository):
             json_text = f.read()
 
             try:
-                self._audit = set(json.loads(json_text))
+                self._audit = json.loads(json_text)
             except Exception as e:
                 pass
 
